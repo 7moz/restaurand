@@ -1,0 +1,40 @@
+<svg width="680" height="400" viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .logo-main  { font-family: Arial, sans-serif; font-size: 62px; font-weight: 900; letter-spacing: -2px; }
+      .logo-fresh { fill: #e84c1e; }
+      .logo-food  { fill: #1c1c1c; }
+      .logo-sub   { font-family: Arial, sans-serif; font-size: 17px; font-weight: 400; fill: #777777; letter-spacing: 3px; }
+      .logo-loc   { font-family: Arial, sans-serif; font-size: 20px; font-weight: 700; fill: #e84c1e; letter-spacing: 8px; }
+    </style>
+  </defs>
+
+  <ellipse cx="340" cy="165" rx="68" ry="10" fill="#e84c1e" opacity="0.15"/>
+  <ellipse cx="340" cy="162" rx="68" ry="10" fill="none" stroke="#e84c1e" stroke-width="2.5"/>
+
+  <path d="M272 162 Q272 98 340 92 Q408 98 408 162 Z" fill="#e84c1e"/>
+
+  <path d="M322 85 Q318 74 322 63 Q326 52 322 41" fill="none" stroke="#e84c1e" stroke-width="2.2" stroke-linecap="round" opacity="0.5"/>
+  <path d="M340 82 Q336 69 340 56 Q344 43 340 30" fill="none" stroke="#e84c1e" stroke-width="2.2" stroke-linecap="round" opacity="0.7"/>
+  <path d="M358 85 Q362 74 358 63 Q354 52 358 41" fill="none" stroke="#e84c1e" stroke-width="2.2" stroke-linecap="round" opacity="0.5"/>
+
+  <ellipse cx="340" cy="93" rx="10" ry="6" fill="#c63d12"/>
+
+  <path d="M290 138 Q300 118 318 108" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.25"/>
+
+  <text text-anchor="middle" x="340" y="228">
+    <tspan class="logo-main logo-fresh">FRESH </tspan><tspan class="logo-main logo-food">FOOD</tspan>
+  </text>
+
+  <line x1="180" y1="248" x2="500" y2="248" stroke="#e8e8e8" stroke-width="1"/>
+  <rect x="332" y="243" width="16" height="10" rx="5" fill="#e84c1e"/>
+
+  <text class="logo-loc" x="340" y="282" text-anchor="middle">PARIS</text>
+
+  <text class="logo-sub" x="340" y="318" text-anchor="middle">pizza · fast food · cuisine fraiche</text>
+
+  <rect x="250" y="340" width="60" height="2.5" rx="1" fill="#e84c1e" opacity="0.4"/>
+  <rect x="316" y="340" width="10" height="2.5" rx="1" fill="#e84c1e"/>
+  <rect x="332" y="340" width="98" height="2.5" rx="1" fill="#e84c1e" opacity="0.4"/>
+
+</svg>
