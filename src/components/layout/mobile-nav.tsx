@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, LogOut, MailWarning, Menu, MenuSquare, Store, X } from 'lucide-react'
+import { LayoutDashboard, LogOut, MailWarning, Menu, MenuSquare, Store, X, ClipboardList } from 'lucide-react'
 import { Button } from '../ui/button'
 import { cn } from '../../lib/utils'
 import { useAuth } from '../../context/auth-context'
@@ -41,6 +41,7 @@ export function MobileNav() {
       icon: LayoutDashboard,
       roles: ['USER', 'ADMIN'],
     },
+    { labelKey: 'adminNav.orders', to: ROUTES.adminOrders, icon: ClipboardList, roles: ['ADMIN'] },
     { labelKey: 'adminNav.reclamations', to: ROUTES.reclamations, icon: MailWarning, roles: ['ADMIN'] },
     { labelKey: 'adminNav.category', to: ROUTES.categories, icon: Store, roles: ['ADMIN'] },
     { labelKey: 'adminNav.menus', to: ROUTES.menus, icon: MenuSquare, roles: ['ADMIN'] },
