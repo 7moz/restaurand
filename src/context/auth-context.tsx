@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
-import { onAuthStateChanged, signOut } from 'firebase/auth'
+import { signOut } from 'firebase/auth'
 import { authApi } from '../api'
-import { firebaseAuth, signInWithGoogle, getGoogleRedirectResult } from '../lib/firebase-auth'
+import { firebaseAuth, signInWithGooglePopup } from '../lib/firebase-auth'
 import type { AuthUser, UserRole } from '../types/auth'
 
 interface AuthContextValue {
@@ -56,52 +56,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-    useEffect(() => {
-      let mounted = true
-  
-      const unsubscribe = onAuthStateChanged(firebaseAuth, async (firebaseUser) => {
-        if (!firebaseUser || !mounted) {
-          // If no Firebase user, check if we have a session cookie already
-          try {
-            const response = await authApi.me()
-            if (mounted) {
-              setUser(response.data)
-              setToken(SESSION_TOKEN_MARKER)
-            }
-          } catch {
-            if (mounted) {
-              setUser(null)
-              setToken(null)
-            }
-          } finally {
-            if (mounted) setIsLoading(false)
-          }
-          return
+  useEffect(() => {
+    let mounted = true
+
+    const bootstrap = async () => {
+      try {
+        const response = await authApi.me()
+        if (mounted) {
+          setToken(SESSION_TOKEN_MARKER)
+          setUser(response.data)
         }
-  
-        // We have a Firebase user! Sync with backend
-        try {
-          console.log('Firebase user detected:', firebaseUser.email)
-          const firebaseIdToken = await firebaseUser.getIdToken()
-          await authApi.firebaseLogin({ token: firebaseIdToken })
-          
-          const response = await authApi.me()
-          if (mounted) {
-            setUser(response.data)
-            setToken(SESSION_TOKEN_MARKER)
-          }
-        } catch (error) {
-          console.error('Auth sync error:', error)
-        } finally {
-          if (mounted) setIsLoading(false)
+      } catch {
+        if (mounted) {
+          setUser(null)
+          setToken(null)
         }
-      })
-  
-      return () => {
-        mounted = false
-        unsubscribe()
+      } finally {
+        if (mounted) {
+          setIsLoading(false)
+        }
       }
-    }, [])
+    }
+
+    bootstrap()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   const login = async (email: string, password: string) => {
     await authApi.login({ email, password })
@@ -117,9 +99,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const loginWithGoogle = async () => {
-    await signInWithGoogle()
-    // The page will redirect, so we don't return anything here
-    return {} as AuthUser
+    const firebaseIdToken = await signInWithGooglePopup()
+    await authApi.firebaseLogin({ token: firebaseIdToken })
+
+    try {
+      const meResponse = await authApi.me()
+      setToken(SESSION_TOKEN_MARKER)
+      setUser(meResponse.data)
+      return meResponse.data
+    } catch (error) {
+      throw new Error(normalizeError(error))
+    }
   }
 
   const register = async (fullName: string, email: string, phone: string, password: string) => {
