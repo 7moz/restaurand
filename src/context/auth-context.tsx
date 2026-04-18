@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { signOut } from 'firebase/auth'
 import { authApi } from '../api'
-import { firebaseAuth, signInWithGooglePopup } from '../lib/firebase-auth'
+import { firebaseAuth, signInWithGoogle, getGoogleRedirectResult } from '../lib/firebase-auth'
 import type { AuthUser, UserRole } from '../types/auth'
 
 interface AuthContextValue {
@@ -61,6 +61,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const bootstrap = async () => {
       try {
+        // Handle redirect result first
+        const firebaseIdToken = await getGoogleRedirectResult()
+        if (firebaseIdToken && mounted) {
+          await authApi.firebaseLogin({ token: firebaseIdToken })
+        }
+
         const response = await authApi.me()
         if (mounted) {
           setToken(SESSION_TOKEN_MARKER)
@@ -99,17 +105,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const loginWithGoogle = async () => {
-    const firebaseIdToken = await signInWithGooglePopup()
-    await authApi.firebaseLogin({ token: firebaseIdToken })
-
-    try {
-      const meResponse = await authApi.me()
-      setToken(SESSION_TOKEN_MARKER)
-      setUser(meResponse.data)
-      return meResponse.data
-    } catch (error) {
-      throw new Error(normalizeError(error))
-    }
+    await signInWithGoogle()
+    // The page will redirect, so we don't return anything here
+    return {} as AuthUser
   }
 
   const register = async (fullName: string, email: string, phone: string, password: string) => {
