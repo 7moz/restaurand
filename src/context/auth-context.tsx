@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
-import { signOut } from 'firebase/auth'
+import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { authApi } from '../api'
 import { firebaseAuth, signInWithGoogle, getGoogleRedirectResult } from '../lib/firebase-auth'
 import type { AuthUser, UserRole } from '../types/auth'
@@ -59,7 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
       let mounted = true
   
-      const unsubscribe = firebaseAuth.onAuthStateChanged(async (firebaseUser) => {
+      const unsubscribe = onAuthStateChanged(firebaseAuth, async (firebaseUser) => {
         if (!firebaseUser || !mounted) {
           // If no Firebase user, check if we have a session cookie already
           try {
