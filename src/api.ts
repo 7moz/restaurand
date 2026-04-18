@@ -25,6 +25,15 @@ export const api = axios.create({
   },
 })
 
+// Add token to headers from localStorage
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('resto_token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
 export function resolveBackendUrl(url?: string | null) {
   if (!url) {
     return null

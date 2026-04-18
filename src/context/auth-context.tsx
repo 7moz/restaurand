@@ -86,8 +86,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const login = async (email: string, password: string) => {
-    await authApi.login({ email, password })
-
+    const response = await authApi.login({ email, password })
+    const token = response.data.token
+    if (token) {
+      localStorage.setItem('resto_token', token)
+    }
+    
     try {
       const meResponse = await authApi.me()
       setToken(SESSION_TOKEN_MARKER)
@@ -100,6 +104,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginWithGoogle = async () => {
     const firebaseIdToken = await signInWithGooglePopup()
+    localStorage.setItem('resto_token', firebaseIdToken) // Store the token!
     await authApi.firebaseLogin({ token: firebaseIdToken })
 
     try {
@@ -120,6 +125,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await authApi.logout()
     } finally {
+      localStorage.removeItem('resto_token') // Clear the token!
       setUser(null)
       setToken(null)
       await signOut(firebaseAuth).catch(() => undefined)
