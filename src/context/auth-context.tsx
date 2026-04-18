@@ -56,50 +56,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  useEffect(() => {
-    let mounted = true
-
-    const bootstrap = async () => {
-      try {
-        console.log('--- BOOTSTRAP START ---');
-        // Handle redirect result first
-        const firebaseIdToken = await getGoogleRedirectResult()
-        console.log('Firebase Token from redirect:', firebaseIdToken ? 'FOUND' : 'NOT FOUND');
-
-        if (firebaseIdToken && mounted) {
-          console.log('Attempting backend login with Firebase token...');
+    useEffect(() => {
+      let mounted = true
+  
+      const unsubscribe = firebaseAuth.onAuthStateChanged(async (firebaseUser) => {
+        if (!firebaseUser || !mounted) {
+          // If no Firebase user, check if we have a session cookie already
+          try {
+            const response = await authApi.me()
+            if (mounted) {
+              setUser(response.data)
+              setToken(SESSION_TOKEN_MARKER)
+            }
+          } catch {
+            if (mounted) {
+              setUser(null)
+              setToken(null)
+            }
+          } finally {
+            if (mounted) setIsLoading(false)
+          }
+          return
+        }
+  
+        // We have a Firebase user! Sync with backend
+        try {
+          console.log('Firebase user detected:', firebaseUser.email)
+          const firebaseIdToken = await firebaseUser.getIdToken()
           await authApi.firebaseLogin({ token: firebaseIdToken })
-          console.log('Backend login SUCCESSFUL');
+          
+          const response = await authApi.me()
+          if (mounted) {
+            setUser(response.data)
+            setToken(SESSION_TOKEN_MARKER)
+          }
+        } catch (error) {
+          console.error('Auth sync error:', error)
+        } finally {
+          if (mounted) setIsLoading(false)
         }
-
-        console.log('Checking current session with /api/auth/me...');
-        const response = await authApi.me()
-        console.log('Session check result:', response.data ? 'USER FOUND' : 'NO USER');
-
-        if (mounted) {
-          setToken(SESSION_TOKEN_MARKER)
-          setUser(response.data)
-        }
-      } catch (error) {
-        console.error('BOOTSTRAP ERROR:', error);
-        if (mounted) {
-          setUser(null)
-          setToken(null)
-        }
-      } finally {
-        if (mounted) {
-          setIsLoading(false)
-        }
-        console.log('--- BOOTSTRAP FINISHED ---');
+      })
+  
+      return () => {
+        mounted = false
+        unsubscribe()
       }
-    }
-
-    bootstrap()
-
-    return () => {
-      mounted = false
-    }
-  }, [])
+    }, [])
 
   const login = async (email: string, password: string) => {
     await authApi.login({ email, password })
