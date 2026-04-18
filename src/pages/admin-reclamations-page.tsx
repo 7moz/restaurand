@@ -251,7 +251,6 @@ export function AdminReclamationsPage() {
                 <p className="text-sm font-semibold">#{selected.id} • {selected.fullName}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{selected.email}</p>
                 {selected.phone && <p className="text-xs text-muted-foreground">{selected.phone}</p>}
-                {selected.phone && <p className="text-xs text-muted-foreground">{selected.phone}</p>}
 
                 <div className="mt-4 space-y-2 text-sm">
                   <p>
