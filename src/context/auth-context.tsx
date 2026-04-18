@@ -61,18 +61,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const bootstrap = async () => {
       try {
+        console.log('--- BOOTSTRAP START ---');
         // Handle redirect result first
         const firebaseIdToken = await getGoogleRedirectResult()
+        console.log('Firebase Token from redirect:', firebaseIdToken ? 'FOUND' : 'NOT FOUND');
+
         if (firebaseIdToken && mounted) {
+          console.log('Attempting backend login with Firebase token...');
           await authApi.firebaseLogin({ token: firebaseIdToken })
+          console.log('Backend login SUCCESSFUL');
         }
 
+        console.log('Checking current session with /api/auth/me...');
         const response = await authApi.me()
+        console.log('Session check result:', response.data ? 'USER FOUND' : 'NO USER');
+
         if (mounted) {
           setToken(SESSION_TOKEN_MARKER)
           setUser(response.data)
         }
-      } catch {
+      } catch (error) {
+        console.error('BOOTSTRAP ERROR:', error);
         if (mounted) {
           setUser(null)
           setToken(null)
@@ -81,6 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (mounted) {
           setIsLoading(false)
         }
+        console.log('--- BOOTSTRAP FINISHED ---');
       }
     }
 
