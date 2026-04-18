@@ -11,6 +11,7 @@ export interface AuthUser {
 export interface LoginResponse {
   uid: string
   email: string
+  token?: string
 }
 
 export interface RegisterResponse {
